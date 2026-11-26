@@ -31,11 +31,11 @@ Keine besonderen Anforderungen. Jeder Rechner, auf dem Python und ein moderner B
 
 - Für den Betrieb ist keine Internetverbindung nötig. Bootstrap liegt lokal in `game/lib/`.
 - Der Server läuft auf `http://localhost:8000` (Port als Argument änderbar, z. B. `python3 server.py 9000`).
-- Das Spiel darf nicht per `file://` geöffnet werden, es muss über den Server laufen.
+- Das Spiel darf nicht per `file://` geöffnet werden, es muss über den Server laufen!!!
 
 ## Starten
 
 1. Passendes Start-Skript im Projektordner ausführen.
-2. Im Browser `http://localhost:8000` öffnen.
+2. Im Browser `http://localhost:8000` öffnen, wenn nicht automatisch startet.
 
 Der Adminbereich speichert Decks in `game/data/decks/`. Das Standard-Deck `default.json` ist geschützt und kann nicht gelöscht werden.
