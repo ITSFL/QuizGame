@@ -1,0 +1,267 @@
+/*
+ * Copyright 2026 by Florian Lohkamp
+ * Lizenz: GNU GPL v3, siehe LIZENZ_DE_GNU_GPL_v3.md im Projektordner
+ */
+/* QuizGame Styling */
+
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+.screen {
+    min-height: 100vh;
+}
+
+#screen-mode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Game Board */
+.game-board {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 2rem;
+}
+
+.board-category {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 12px 8px;
+    background-color: #1a1a2e;
+    border: 2px solid #0f3460;
+    border-radius: 5px;
+    word-break: break-word;
+}
+
+.board-cell {
+    min-height: 70px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #0f3460;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0f3460;
+    color: white;
+    position: relative;
+}
+
+.board-cell:hover:not(.answered) {
+    background-color: #16a085;
+    transform: scale(1.05);
+}
+
+.board-cell.answered {
+    background-color: #333;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.board-cell.answered:hover {
+    transform: none;
+}
+
+/* Scoreboard */
+.scoreboard {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.team-score {
+    padding: 12px 18px;
+    background-color: #1a1a2e;
+    border: 2px solid #666;
+    border-radius: 8px;
+    min-width: 140px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.team-score.active {
+    border-color: #16a085;
+    background-color: #0f3460;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(22, 160, 133, 0.5);
+}
+
+.team-name {
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.team-points {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #16a085;
+}
+
+.team-score.active .team-points {
+    color: #1abc9c;
+}
+
+/* Active Team Indicator */
+#activeTeamIndicator {
+    font-size: 1.1rem;
+    color: #1abc9c;
+    font-weight: bold;
+}
+
+/* Punkteleiste ausblenden, solange das Scoreboard-Fenster offen ist */
+body.scoreboard-open #scoreboard {
+    display: none;
+}
+
+/* Timer Display */
+.timer-display {
+    font-size: 1.8rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    padding: 4px 12px;
+    border-radius: 6px;
+    min-width: 80px;
+    text-align: center;
+    transition: color 0.5s ease, background-color 0.5s ease;
+}
+
+.timer-green {
+    color: #2ecc71;
+    background-color: rgba(46, 204, 113, 0.1);
+}
+
+.timer-yellow {
+    color: #f1c40f;
+    background-color: rgba(241, 196, 15, 0.15);
+}
+
+.timer-red {
+    color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.2);
+    animation: timer-pulse 1s infinite;
+}
+
+@keyframes timer-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.timer-expired {
+    color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.3);
+}
+
+/* Question Modal */
+.question-text {
+    font-size: 1.5rem;
+    min-height: 80px;
+    line-height: 1.6;
+}
+
+.answer-text {
+    font-size: 1.3rem;
+    padding: 15px;
+    background-color: #198754;
+    border-radius: 8px;
+}
+
+/* Results */
+.results-container {
+    list-style: none;
+    padding: 0;
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    background-color: #1a1a2e;
+    border: 2px solid #0f3460;
+    border-radius: 8px;
+    gap: 15px;
+}
+
+.result-item.winner {
+    border-color: #f1c40f;
+    background-color: #0f3460;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+}
+
+.result-rank {
+    font-size: 1.5rem;
+    min-width: 40px;
+    text-align: center;
+}
+
+.result-name {
+    flex-grow: 1;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.result-score {
+    font-size: 1.3rem;
+    color: #16a085;
+    font-weight: bold;
+}
+
+/* Responsive: Beamer / große Displays */
+@media (min-width: 1200px) {
+    .board-category {
+        font-size: 1.3rem;
+        padding: 15px 10px;
+    }
+    .board-cell {
+        min-height: 90px;
+        font-size: 1.8rem;
+    }
+    .question-text {
+        font-size: 2rem;
+    }
+    .answer-text {
+        font-size: 1.6rem;
+    }
+    .timer-display {
+        font-size: 2.2rem;
+    }
+}
+
+/* Responsive: Tablet */
+@media (max-width: 768px) {
+    .board-category {
+        font-size: 0.85rem;
+        padding: 8px 4px;
+    }
+    .board-cell {
+        min-height: 55px;
+        font-size: 1rem;
+    }
+    .team-score {
+        min-width: 100px;
+        padding: 8px 12px;
+    }
+    .team-points {
+        font-size: 1.3rem;
+    }
+    .question-text {
+        font-size: 1.2rem;
+    }
+}
+
+/* Fullscreen adjustments */
+:fullscreen .game-board {
+    max-height: calc(100vh - 200px);
+}
+
+:fullscreen .board-cell {
+    min-height: 80px;
+}

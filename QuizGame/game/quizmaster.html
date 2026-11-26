@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--
+Copyright 2026 by Florian Lohkamp
+Lizenz: GNU GPL v3, siehe LIZENZ_DE_GNU_GPL_v3.md im Projektordner
+-->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizGame - Quizmaster</title>
+    <link rel="stylesheet" href="./lib/bootstrap.min.css">
+    <link rel="stylesheet" href="./lib/quizgame.css">
+    <style>
+        body { background-color: #111; color: #eee; }
+        .qm-meta { color: #aaa; font-size: 1.1rem; }
+        .qm-label { color: #888; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em; }
+        .qm-question { font-size: 2rem; white-space: pre-wrap; }
+        .qm-answer { font-size: 2rem; color: #7fd1ff; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="text-center mb-4">🎤 Quizmaster</h1>
+
+        <div id="qmActive" class="d-none">
+            <div class="d-flex justify-content-between flex-wrap qm-meta mb-3">
+                <span id="qmCategory"></span>
+                <span id="qmValue"></span>
+                <span>Team: <strong id="qmTeam"></strong></span>
+            </div>
+            <div id="qmBet" class="text-warning mb-3 d-none"></div>
+
+            <div class="card bg-secondary text-light p-4 mb-3">
+                <div class="qm-label mb-2">Frage</div>
+                <div id="qmQuestion" class="qm-question"></div>
+            </div>
+
+            <div class="card bg-dark text-light p-4">
+                <div class="qm-label mb-2">Antwort</div>
+                <div id="qmAnswer" class="qm-answer"></div>
+            </div>
+        </div>
+
+        <p id="qmEmpty" class="text-center text-secondary">Keine aktive Frage.</p>
+    </div>
+
+    <script>
+        const channel = new BroadcastChannel('quizgame-quizmaster');
+        const active = document.getElementById('qmActive');
+        const empty = document.getElementById('qmEmpty');
+
+        function showQuestion(data) {
+            document.getElementById('qmCategory').textContent = data.category;
+            document.getElementById('qmValue').textContent = `${data.value} Punkte`;
+            document.getElementById('qmTeam').textContent = data.team;
+            document.getElementById('qmQuestion').textContent = data.question;
+            document.getElementById('qmAnswer').textContent = data.answer;
+
+            const bet = document.getElementById('qmBet');
+            bet.textContent = data.isRisk ? `⚠️ Risiko-Einsatz: ${data.bet} Punkte` : '';
+            bet.classList.toggle('d-none', !data.isRisk);
+
+            active.classList.remove('d-none');
+            empty.classList.add('d-none');
+        }
+
+        function clearQuestion() {
+            active.classList.add('d-none');
+            empty.classList.remove('d-none');
+        }
+
+        channel.onmessage = event => {
+            if (event.data.type === 'question') {
+                showQuestion(event.data);
+            } else if (event.data.type === 'clear') {
+                clearQuestion();
+            }
+        };
+
+        channel.postMessage({ type: 'hello' });
+    </script>
+</body>
+</html>

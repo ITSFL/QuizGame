@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<!--
+Copyright 2026 by Florian Lohkamp
+Lizenz: GNU GPL v3, siehe LIZENZ_DE_GNU_GPL_v3.md im Projektordner
+-->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizGame</title>
+    <link rel="stylesheet" href="./lib/bootstrap.min.css">
+    <link rel="stylesheet" href="./lib/quizgame.css">
+</head>
+<body class="bg-dark text-light">
+
+    <!-- Modus-Auswahl -->
+    <div id="screen-mode" class="screen">
+        <div class="container mt-5">
+            <div class="text-center mb-4">
+                <img src="./logo.png" alt="QuizGame Logo" class="img-fluid" style="max-height: 400px;">
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <button id="modeGameBtn" class="btn btn-primary btn-lg w-100 mb-3">🎮 Spiel starten</button>
+                    <button id="modeAdminBtn" class="btn btn-secondary btn-lg w-100">⚙️ Admin-Bereich</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="screen-start" class="screen d-none">
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">🎮 QuizGame – Spielvorbereitung</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card bg-secondary text-light p-4">
+                        <div class="mb-3">
+                            <label for="deckSelect" class="form-label">Deck auswählen:</label>
+                            <select id="deckSelect" class="form-select">
+                                <option value="default">Standard-Deck</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="teamCount" class="form-label">Anzahl Teams (2-6):</label>
+                            <input type="number" id="teamCount" class="form-control" min="2" max="6" value="2">
+                        </div>
+
+                        <div id="teamNamesContainer" class="mb-4"></div>
+
+                        <button id="startGameBtn" class="btn btn-primary btn-lg w-100 mb-2">Spiel starten</button>
+                        <button id="openScoreboardBtn" class="btn btn-outline-info w-100 mb-2">📺 Scoreboard öffnen</button>
+                        <button id="backToModeBtn" class="btn btn-outline-secondary w-100">← Zurück</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Board Screen -->
+    <div id="screen-board" class="screen d-none">
+        <div class="container-fluid py-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 id="boardTitle">QuizGame</h2>
+                <div>
+                    <a id="openScoreboardLink" href="./scoreboard.html" class="btn btn-outline-info btn-sm me-2">📺 Scoreboard</a>
+                    <a id="openQuizmasterLink" href="./quizmaster.html" class="btn btn-outline-warning btn-sm me-2">🎤 Quizmaster</a>
+                    <button id="fullscreenBtn" class="btn btn-secondary btn-sm me-2">🖥️ Vollbild</button>
+                    <button id="resetGameBtn" class="btn btn-danger btn-sm">Neues Spiel</button>
+                </div>
+            </div>
+
+            <!-- Scoreboard -->
+            <div id="scoreboard" class="scoreboard mb-3"></div>
+
+            <!-- Active Team Indicator -->
+            <div id="activeTeamIndicator" class="text-center mb-2"></div>
+
+            <!-- Game Board Grid -->
+            <div id="gameBoard" class="game-board"></div>
+        </div>
+    </div>
+
+    <!-- Question Modal -->
+    <div class="modal fade" id="questionModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Frage</h5>
+                    <div id="timerDisplay" class="timer-display">01:00</div>
+                </div>
+                <div class="modal-body">
+                    <!-- Risiko-Einsatz Phase -->
+                    <div id="riskPhase" class="d-none">
+                        <div class="text-center mb-4">
+                            <h2 class="text-warning">⚠️ RISIKO-FRAGE!</h2>
+                            <p class="fs-5">Aktives Team: <strong id="riskTeamName"></strong></p>
+                            <p>Aktueller Score: <strong id="riskTeamScore"></strong> Punkte</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="riskBetInput" class="form-label">Einsatz (0 bis aktueller Score):</label>
+                            <input type="number" id="riskBetInput" class="form-control form-control-lg" min="0" value="0">
+                            <div id="riskBetError" class="text-danger mt-1 d-none">Ungültiger Einsatz!</div>
+                        </div>
+                        <button id="confirmBetBtn" class="btn btn-warning btn-lg w-100">Einsatz bestätigen</button>
+                    </div>
+
+                    <!-- Frage Phase -->
+                    <div id="questionPhase" class="d-none">
+                        <div id="questionText" class="question-text mb-4"></div>
+
+                        <!-- Timer-Aktionen während Countdown -->
+                        <div id="timerActions" class="mb-3">
+                            <button id="answerGivenBtn" class="btn btn-info btn-lg w-100">Antwort eingegeben</button>
+                        </div>
+
+                        <!-- Bewertung nach Antwort (Antwort bleibt verborgen, solange noch ein anderes Team raten kann) -->
+                        <div id="answerPhase" class="d-none">
+                            <div id="riskBetDisplay" class="text-warning mb-2 d-none"></div>
+                            <div class="d-grid gap-2 d-sm-flex">
+                                <button id="correctBtn" class="btn btn-success btn-lg flex-grow-1">✓ Richtig</button>
+                                <button id="wrongBtn" class="btn btn-danger btn-lg flex-grow-1">✗ Falsch</button>
+                            </div>
+                        </div>
+
+                        <!-- Auflösung: Antwort wird erst gezeigt, wenn kein Team mehr raten kann -->
+                        <div id="revealPhase" class="d-none">
+                            <div id="answerText" class="answer-text mb-3"></div>
+                            <button id="closeQuestionBtn" class="btn btn-secondary btn-lg w-100">Frage schließen</button>
+                        </div>
+
+                        <!-- Timeout Phase -->
+                        <div id="timeoutPhase" class="d-none">
+                            <div class="text-center mb-3">
+                                <h3 class="text-danger">⏰ Zeit abgelaufen!</h3>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button id="showAnswerTimeoutBtn" class="btn btn-info btn-lg">Antwort zeigen</button>
+                            </div>
+                            <!-- Antwort nach Timeout -->
+                            <div id="timeoutAnswerContainer" class="d-none mt-3">
+                                <div id="timeoutAnswerText" class="answer-text mb-3"></div>
+                                <button id="closeAfterTimeoutBtn" class="btn btn-secondary btn-lg w-100">Frage schließen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="screen-result" class="screen d-none">
+        <div class="container mt-5">
+            <h1 class="text-center mb-5">🏆 Spielende</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div id="resultsList" class="mb-4"></div>
+                    <button id="newGameBtn" class="btn btn-primary btn-lg w-100">🎮 Neues Spiel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Screen (Platzhalter Phase 3) -->
+    <div id="screen-admin" class="screen d-none">
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">⚙️ Admin-Bereich</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="d-flex gap-2 mb-3">
+                        <button id="adminNewDeckBtn" class="btn btn-success flex-fill">+ Neues Deck</button>
+                        <button id="adminImportBtn" class="btn btn-info flex-fill">Deck importieren</button>
+                        <input type="file" id="adminImportInput" accept=".json,application/json" class="d-none">
+                    </div>
+                    <div id="adminMessage" class="mb-3"></div>
+                    <div id="deckList" class="mb-4"></div>
+                    <button id="backToModeFromAdminBtn" class="btn btn-outline-secondary w-100">← Zurück</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deck Editor Screen -->
+    <div id="screen-deck-editor" class="screen d-none">
+        <div class="container mt-4 mb-5">
+            <h1 class="text-center mb-4">Deck bearbeiten</h1>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div id="editorErrors" class="mb-3"></div>
+
+                    <div class="card bg-dark text-light mb-4">
+                        <div class="card-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="editorDeckTitle" class="form-label">Titel</label>
+                                    <input type="text" id="editorDeckTitle" class="form-control" placeholder="Deck-Titel">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="editorDeckId" class="form-label">ID (a-z, 0-9, _ und -)</label>
+                                    <input type="text" id="editorDeckId" class="form-control" placeholder="z. B. mathe_01">
+                                </div>
+                            </div>
+                            <label class="form-label">Punktwerte (5 verschiedene Werte)</label>
+                            <div id="editorPointValues" class="row row-cols-5 g-2"></div>
+                        </div>
+                    </div>
+
+                    <div id="editorCategories"></div>
+
+                    <div class="d-flex gap-2 mb-5">
+                        <button id="editorAddCategoryBtn" class="btn btn-outline-light">+ Kategorie</button>
+                        <div class="ms-auto d-flex gap-2">
+                            <button id="editorCancelBtn" class="btn btn-outline-secondary">Abbrechen</button>
+                            <button id="editorSaveBtn" class="btn btn-primary">Speichern</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-secondary small py-3">
+        Copyright 2026 by Florian Lohkamp · Lizenziert unter der <a href="./LIZENZ_DE_GNU_GPL_v3.md" class="text-info">GNU GPL v3</a>
+    </footer>
+
+    <script src="./lib/js/bootstrap.bundle.min.js"></script>
+    <script src="./lib/js/game-state.js"></script>
+    <script src="./lib/js/board-renderer.js"></script>
+    <script src="./lib/js/timer.js"></script>
+    <script src="./lib/js/deck-manager.js"></script>
+    <script src="./lib/js/admin.js"></script>
+    <script src="./lib/js/quizgame.js"></script>
+</body>
+</html>

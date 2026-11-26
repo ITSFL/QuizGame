@@ -1,0 +1,56 @@
+{
+  "quiz": {
+    "id": "rettungsdienst_01",
+    "title": "Testdeck",
+    "pointValues": [
+      200,
+      400,
+      600,
+      800,
+      1000
+    ],
+    "categories": [
+      {
+        "id": "cat_t1aeev",
+        "name": "Atmung",
+        "questions": [
+          {
+            "id": "cat_t1aeev_200",
+            "value": 200,
+            "question": "Die Atemfrequenz eines Erwachsenen Patienten",
+            "answer": "15",
+            "isRisk": false
+          },
+          {
+            "id": "cat_t1aeev_400",
+            "value": 400,
+            "question": "Frage 2",
+            "answer": "AW 2",
+            "isRisk": false
+          },
+          {
+            "id": "cat_t1aeev_600",
+            "value": 600,
+            "question": "Frage 3",
+            "answer": "AW 3",
+            "isRisk": true
+          },
+          {
+            "id": "cat_t1aeev_800",
+            "value": 800,
+            "question": "Frage 4",
+            "answer": "AW 4",
+            "isRisk": true
+          },
+          {
+            "id": "cat_t1aeev_1000",
+            "value": 1000,
+            "question": "Frage 5",
+            "answer": "AW 5",
+            "isRisk": false
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--
+Copyright 2026 by Florian Lohkamp
+Lizenz: GNU GPL v3, siehe LIZENZ_DE_GNU_GPL_v3.md im Projektordner
+-->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizGame - Scoreboard</title>
+    <link rel="stylesheet" href="./lib/bootstrap.min.css">
+    <link rel="stylesheet" href="./lib/quizgame.css">
+    <style>
+        body { background-color: #111; color: #eee; }
+        .scoreboard-list { display: flex; flex-direction: column; gap: 12px; }
+        .scoreboard-list .team-score { min-width: 0; display: flex; justify-content: space-between; align-items: center; }
+        .scoreboard-list .team-name { margin: 0; font-size: 1.4rem; }
+        .scoreboard-list .team-points { font-size: 2.2rem; }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="text-center mb-4">📺 Scoreboard</h1>
+        <div id="scoreboardList" class="scoreboard-list"></div>
+        <p id="scoreboardEmpty" class="text-center text-secondary">Noch kein Spiel gestartet.</p>
+    </div>
+
+    <script>
+        const channel = new BroadcastChannel('quizgame-scoreboard');
+        const list = document.getElementById('scoreboardList');
+        const empty = document.getElementById('scoreboardEmpty');
+
+        function renderTeams(teams, activeIndex) {
+            list.replaceChildren(...teams.map((team, index) => {
+                const row = document.createElement('div');
+                row.className = 'team-score' + (index === activeIndex ? ' active' : '');
+
+                const name = document.createElement('div');
+                name.className = 'team-name';
+                name.textContent = team.name;
+
+                const points = document.createElement('div');
+                points.className = 'team-points';
+                points.textContent = team.score;
+
+                row.append(name, points);
+                return row;
+            }));
+            empty.classList.toggle('d-none', teams.length > 0);
+        }
+
+        channel.onmessage = event => {
+            if (event.data.type === 'state') {
+                renderTeams(event.data.teams, event.data.activeIndex);
+            }
+        };
+
+        window.addEventListener('pagehide', () => channel.postMessage({ type: 'bye' }));
+        channel.postMessage({ type: 'hello' });
+    </script>
+</body>
+</html>
