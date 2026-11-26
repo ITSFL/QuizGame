@@ -4,7 +4,7 @@ Lizenz: GNU GPL v3, siehe LIZENZ_DE_GNU_GPL_v3.md im Projektordner
 -->
 # QuizGame
 
-Quizspiel für Teams, das lokal über einen kleinen Python-Server läuft.
+Quizspiel für Teams, das lokal über einen kleinen Python-Server läuft. Ein Raster Quiz mit 1 bis 6 Kategorien mit 5 Fragen pro Kategorie. E können 2 bis 6 Teams / Spieler gegeneinander antreten.
 
 ## Systemanforderungen
 
